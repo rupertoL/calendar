@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 String startTimeThree = mTvThreeStartTime.getText().toString();
                 mCalendarMangerThree.getTimePoint(this, minTime, startTimeThree, this);
+
                 break;
         }
     }
