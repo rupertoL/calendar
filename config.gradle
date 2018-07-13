@@ -1,0 +1,18 @@
+/**
+ * 在主项目的根目录下创建config.gradle文件
+ * 在这里单独处理统一依赖问题
+ * 注意需要在根目录的build.gradle中进行引入
+ */
+ext {
+    configuration = [
+            package          : "cn.lp.calendar",
+            buildToolsVersion: "27.0.3",
+            compileVersion   : 26,
+            minSdk           : 16,
+            targetSdk        : 25,
+            version_code     : 1,
+            version_name     : "1.0.0",
+
+    ]
+
+}
