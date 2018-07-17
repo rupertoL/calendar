@@ -12,7 +12,6 @@ public class DateBean {
 
     public int nowType = -1;
 
-
     /**
      * 当前选择的是开始时间还是结束时间
      */
