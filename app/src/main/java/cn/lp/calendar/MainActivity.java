@@ -18,6 +18,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mTvThreeStartTime;
     int nowType = -1;
     long minTime = 1514736000 * 1000;
+    private TextView mTvNewStartTime;
+    private TextView mTvNewEndTime;
+    private DateBean mDateBean;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +34,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBtnOne.setOnClickListener(this);
         mBtn_tow.setOnClickListener(this);
         mBtn_three.setOnClickListener(this);
+        findViewById(R.id.btn_new).setOnClickListener(this);
 
         mTvOneStartTime = findViewById(R.id.tv_one_start_time);
         mMTvOneEndTime = findViewById(R.id.tv_one_end_time);
 
         mTvTowStartTime = findViewById(R.id.tv_tow_start_time);
         mTvTowEndTime = findViewById(R.id.tv_tow_end_time);
+
+        mTvNewStartTime = findViewById(R.id.tv_new_start_time);
+        mTvNewEndTime = findViewById(R.id.tv_new_end_time);
 
         mTvThreeStartTime = findViewById(R.id.tv_three_start_time);
         initData();
@@ -52,6 +59,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTvTowEndTime.setText(endDate);
 
         mTvThreeStartTime.setText(startData);
+
+        mDateBean = new DateBean();
+        mDateBean.nowType = KCalendarCofig.newInstance().doubleType;
+        mDateBean.choosStartData = startData;
+        mDateBean.choosEndData = endDate;
+        mDateBean.minTime = minTime;
     }
 
     @Override
@@ -74,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String startTimeThree = mTvThreeStartTime.getText().toString();
                 CalendarManger.newInstance().getTimePoint(this, minTime, startTimeThree, this);
                 break;
+            case R.id.btn_new:
+                nowType = 4;
+                CalendarManger.newInstance().getTimeQuantum(this, mDateBean, this);
+                break;
         }
     }
 
@@ -92,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case 3:
                 mTvThreeStartTime.setText(startData);
+                break;
+            case 4:
+                mTvNewStartTime.setText(startData);
+                mTvNewEndTime.setText(endDate);
                 break;
         }
 

@@ -111,6 +111,15 @@ public class CalendarManger {
     }
 
 
+    public void getTimeQuantum(Context context, DateBean dateBean, CalendarTimeListenter calendarTimeListenter) {
+        if (mChooseStartAndEndTime == null) {
+            mChooseStartAndEndTime = new DialogChooseStartAndEndTime(context, calendarTimeListenter);
+            mChooseStartAndEndTime.show();
+        }
+        mChooseStartAndEndTime.chooseSectionTime(dateBean);
+    }
+
+
     /**
      * 区间选择时间端并且没有最小时间
      *
@@ -155,6 +164,14 @@ public class CalendarManger {
             mChooseStartAndEndTime.show();
         }
         mChooseStartAndEndTime.chooseOnlyOneTime(startDate, minTime);
+    }
+
+    public void getTimePoint(Context context, DateBean dateBean, CalendarTimeListenter calendarTimeListenter) {
+        if (mChooseStartAndEndTime == null) {
+            mChooseStartAndEndTime = new DialogChooseStartAndEndTime(context, calendarTimeListenter);
+            mChooseStartAndEndTime.show();
+        }
+        mChooseStartAndEndTime.chooseOnlyOneTime(dateBean);
     }
 
 
