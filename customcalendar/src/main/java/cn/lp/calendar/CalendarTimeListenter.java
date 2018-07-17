@@ -1,7 +1,5 @@
 package cn.lp.calendar;
 
-import java.util.Map;
-
 /**
  * Created by jz on 2018/7/6.
  */
@@ -15,5 +13,5 @@ public interface CalendarTimeListenter {
      *             单独时间：
      *             mStartData = data.get(KCalendarCofig.newInstance().StartTime);  用户选择的时间
      */
-    void chooseDate(Map<String, String> data);
+    void chooseDate(DateBean data);
 }

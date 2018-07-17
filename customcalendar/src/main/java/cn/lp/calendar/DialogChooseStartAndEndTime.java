@@ -16,8 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -36,8 +34,7 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
     private Button mPopupwindowCalendarBtEnter;
     private RelativeLayout mPopupwindowCalendarLastMonth;
     private RelativeLayout mPopupwindowCalendarNextMonth;
-    private Map<String, String> mTimeMap;
-    private String mOnlyOneTimeNowDate;
+    private DateBean mDateBean;
 
     public DialogChooseStartAndEndTime(Context context, CalendarTimeListenter myInterface) {
         super(context, R.style.AlertDialogStyle);
@@ -106,63 +103,56 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
         mChoosNowDate.setOnClickListener(this);
         mPopupwindowCalendarBtEnter.setOnClickListener(this);
 
-        mTimeMap = new HashMap<>();
     }
 
-    public void chooseSectionTime(long minTime, String startDate, String endDate) {
-        KCalendarCofig.newInstance().TimeSelectType = "2";
-        mTimeMap.clear();
+    public void chooseSectionTime(DateBean dateBean) {
+        mDateBean = null;
+        dateBean.nowType = KCalendarCofig.newInstance().doubleType;
         mPopupwindowCalendarMonth.setText(mCalendar.getCalendarYear() + "年"
                 + mCalendar.getCalendarMonth() + "月");
-        KCalendarCofig.newInstance().minTime = minTime;
         mChoosNowDate.setVisibility(View.VISIBLE);
         mTvLine.setVisibility(View.VISIBLE);
-
-        if (!TextUtils.isEmpty(startDate) && !TextUtils.isEmpty(endDate)) {
+        mCalendar.clearAll();
+        if (!TextUtils.isEmpty(dateBean.choosStartData) && !TextUtils.isEmpty(dateBean.choosEndData)) {
             //根据用户已经选择的时间进行设置日历
-            KCalendarCofig.newInstance().nowTimeType = KCalendarCofig.newInstance().nowTimeTypeEnd;
-            int years = Integer.parseInt(startDate.substring(0,
-                    startDate.indexOf("-")));
-            int month = Integer.parseInt(startDate.substring(
-                    startDate.indexOf("-") + 1, startDate.lastIndexOf("-")));
+            dateBean.nowTimeType = KCalendarCofig.newInstance().nowTimeTypeEnd;
+            int years = Integer.parseInt(dateBean.choosStartData.substring(0,
+                    dateBean.choosStartData.indexOf("-")));
+            int month = Integer.parseInt(dateBean.choosStartData.substring(
+                    dateBean.choosStartData.indexOf("-") + 1, dateBean.choosStartData.lastIndexOf("-")));
             mPopupwindowCalendarMonth.setText(years + "年" + month + "月");
-
             mCalendar.showCalendar(years, month);
-            mCalendar.setCalendarDayBgColor(startDate, KCalendarCofig.newInstance().StartSingBg);
+            mCalendar.setCalendarDayBgColor(dateBean.choosStartData, KCalendarCofig.newInstance().StartSingBg);
             mCalendar.showCalendar(years, month);
-            mCalendar.setCalendarDayBgColor(endDate, KCalendarCofig.newInstance().EndSingBg);
-            KCalendarCofig.newInstance().choosStartData = startDate;
-            KCalendarCofig.newInstance().choosEndData = endDate;
+            mCalendar.setCalendarDayBgColor(dateBean.choosEndData, KCalendarCofig.newInstance().EndSingBg);
 
-            int type = compareDate(CalendarDateUtils.str2DateArriveDay(KCalendarCofig.newInstance().choosStartData),
-                    CalendarDateUtils.str2DateArriveDay(KCalendarCofig.newInstance().choosEndData));
+            int type = compareDate(CalendarDateUtils.str2DateArriveDay(dateBean.choosStartData),
+                    CalendarDateUtils.str2DateArriveDay(dateBean.choosEndData));
 
             if (type == 2) {
-                mCalendar.setCalendarDayBgColor(startDate,
+                mCalendar.setCalendarDayBgColor(dateBean.choosStartData,
                         KCalendarCofig.newInstance().oincideSingBg);
             }
 
-        } else if (!TextUtils.isEmpty(startDate)) {
+        } else if (!TextUtils.isEmpty(dateBean.choosStartData)) {
             //用户仅选择了开始时间设置日历
-            KCalendarCofig.newInstance().nowTimeType = KCalendarCofig.newInstance().nowTimeTypeStart;
-            int years = Integer.parseInt(startDate.substring(0,
-                    startDate.indexOf("-")));
-            int month = Integer.parseInt(startDate.substring(
-                    startDate.indexOf("-") + 1, startDate.lastIndexOf("-")));
+            dateBean.nowTimeType = KCalendarCofig.newInstance().nowTimeTypeStart;
+            int years = Integer.parseInt(dateBean.choosStartData.substring(0,
+                    dateBean.choosStartData.indexOf("-")));
+            int month = Integer.parseInt(dateBean.choosStartData.substring(
+                    dateBean.choosStartData.indexOf("-") + 1, dateBean.choosStartData.lastIndexOf("-")));
             mPopupwindowCalendarMonth.setText(years + "年" + month + "月");
             mCalendar.showCalendar(years, month);
-            mCalendar.setCalendarDayBgColor(startDate, KCalendarCofig.newInstance().StartSingBg);
-            KCalendarCofig.newInstance().choosStartData = startDate;
+            mCalendar.setCalendarDayBgColor(dateBean.choosStartData, KCalendarCofig.newInstance().StartSingBg);
         } else {
             //用户初次使用设置日历
-            KCalendarCofig.newInstance().nowTimeType = "";
+            dateBean.nowTimeType = -1;
             String date = CalendarDateUtils.getNowTimeString();
-            KCalendarCofig.newInstance().choosStartData = date;
-            KCalendarCofig.newInstance().choosEndData = date;
+            dateBean.choosStartData = date;
+            dateBean.choosEndData = date;
         }
 
-        mTimeMap.put(KCalendarCofig.newInstance().StartTime, KCalendarCofig.newInstance().choosStartData);
-        mTimeMap.put(KCalendarCofig.newInstance().EndTime, KCalendarCofig.newInstance().choosEndData);
+        mDateBean = dateBean;
         if (!isShowing()) {
             show();
         }
@@ -175,8 +165,27 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
      * @param endDate
      */
     public void chooseSectionTime(String startDate, String endDate) {
-        KCalendarCofig.newInstance().TimeSelectType = "2";
-        chooseSectionTime(-1, startDate, endDate);
+        DateBean dateBean = new DateBean();
+        dateBean.choosStartData = startDate;
+        dateBean.choosEndData = endDate;
+        dateBean.nowType = KCalendarCofig.newInstance().doubleType;
+        dateBean.minTime = -1;
+        chooseSectionTime(dateBean);
+    }
+
+    /**
+     * 选择区间日历
+     *
+     * @param startDate
+     * @param endDate
+     */
+    public void chooseSectionTime(long minTime, String startDate, String endDate) {
+        DateBean dateBean = new DateBean();
+        dateBean.choosStartData = startDate;
+        dateBean.choosEndData = endDate;
+        dateBean.nowType = KCalendarCofig.newInstance().doubleType;
+        dateBean.minTime = minTime;
+        chooseSectionTime(dateBean);
     }
 
     /**
@@ -185,43 +194,50 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
      * @param nowDate
      */
     public void chooseOnlyOneTime(String nowDate) {
-        mOnlyOneTimeNowDate = nowDate;
-        KCalendarCofig.newInstance().TimeSelectType = "1";
-        chooseOnlyOneTime(nowDate, -1);
+        DateBean dateBean = new DateBean();
+        dateBean.choosStartData = nowDate;
+        dateBean.nowType = KCalendarCofig.newInstance().singleType;
+        chooseOnlyOneTime(dateBean);
     }
 
     /**
      * 选择单日期
      *
      * @param nowDate
-     * @param minTime
      */
     public void chooseOnlyOneTime(String nowDate, long minTime) {
-        mTimeMap.clear();
-        KCalendarCofig.newInstance().TimeSelectType = "1";
-        KCalendarCofig.newInstance().minTime = minTime;
+        DateBean dateBean = new DateBean();
+        dateBean.choosStartData = nowDate;
+        dateBean.nowType = KCalendarCofig.newInstance().singleType;
+        chooseOnlyOneTime(dateBean);
+    }
+
+    /**
+     * 选择单日期
+     */
+    public void chooseOnlyOneTime(DateBean dateBean) {
+        mDateBean = null;
 
         mChoosNowDate.setVisibility(View.GONE);
         mTvLine.setVisibility(View.GONE);
+        mCalendar.clearAll();
         mPopupwindowCalendarMonth.setText(mCalendar.getCalendarYear() + "年"
                 + mCalendar.getCalendarMonth() + "月");
-        KCalendarCofig.newInstance().choosStartData = "";
-        KCalendarCofig.newInstance().choosEndData = "";
-        if (!TextUtils.isEmpty(nowDate)) {
-            int years = Integer.parseInt(nowDate.substring(0,
-                    nowDate.indexOf("-")));
-            int month = Integer.parseInt(nowDate.substring(
-                    nowDate.indexOf("-") + 1, nowDate.lastIndexOf("-")));
+        if (!TextUtils.isEmpty(dateBean.choosStartData)) {
+            int years = Integer.parseInt(dateBean.choosStartData.substring(0,
+                    dateBean.choosStartData.indexOf("-")));
+            int month = Integer.parseInt(dateBean.choosStartData.substring(
+                    dateBean.choosStartData.indexOf("-") + 1, dateBean.choosStartData.lastIndexOf("-")));
             mPopupwindowCalendarMonth.setText(years + "年" + month + "月");
             mCalendar.showCalendar(years, month);
 
-            mCalendar.setCalendarDayBgColor(nowDate, KCalendarCofig.newInstance().OnceSingBg);
+            mCalendar.setCalendarDayBgColor(dateBean.choosStartData, KCalendarCofig.newInstance().OnceSingBg);
 
         } else {
             String date = CalendarDateUtils.getNowTimeString();
-            KCalendarCofig.newInstance().choosStartData = date;
+            dateBean.choosStartData = date;
         }
-        mTimeMap.put(KCalendarCofig.newInstance().StartTime, KCalendarCofig.newInstance().choosStartData);
+        mDateBean = dateBean;
         if (!isShowing()) {
             show();
         }
@@ -248,8 +264,8 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
             /**
              * 点击上个月判断是否小于用户设置的最小时间的当前月份
              */
-            if (KCalendarCofig.newInstance().minTime > 0) {
-                if (CalendarDateUtils.compareMonth(KCalendarCofig.newInstance().minTime, mCalendar.getCalendarMonth(), mCalendar.getCalendarYear())) {
+            if (mDateBean.minTime > 0) {
+                if (CalendarDateUtils.compareMonth(mDateBean.minTime, mCalendar.getCalendarMonth(), mCalendar.getCalendarYear())) {
                     mCalendar.lastMonth();
                 } else {
                     Toast.makeText(context, KCalendarCofig.newInstance().exceedHint, Toast.LENGTH_LONG).show();
@@ -276,11 +292,9 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
         } else if (i == R.id.choos_now_date) {
             if (myInterface != null) {
                 String date = CalendarDateUtils.getNowTimeString();
-                KCalendarCofig.newInstance().choosStartData = date;
-                KCalendarCofig.newInstance().choosEndData = date;
-                mTimeMap.put(KCalendarCofig.newInstance().StartTime, KCalendarCofig.newInstance().choosStartData);
-                mTimeMap.put(KCalendarCofig.newInstance().EndTime, KCalendarCofig.newInstance().choosEndData);
-                myInterface.chooseDate(mTimeMap);
+                mDateBean.choosStartData = date;
+                mDateBean.choosEndData = date;
+                myInterface.chooseDate(mDateBean);
             }
             if (isShowing()) {
                 dismiss();
@@ -290,21 +304,16 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
              * 选择确定
              */
             if (myInterface != null) {
-                if (!TextUtils.isEmpty(KCalendarCofig.newInstance().TimeSelectType) && "2".equals(KCalendarCofig.newInstance().TimeSelectType)) {
+                if (mDateBean.nowType == KCalendarCofig.newInstance().doubleType) {
                     if (myInterface != null) {
-                        mTimeMap.put(KCalendarCofig.newInstance().StartTime, KCalendarCofig.newInstance().choosStartData);
-                        mTimeMap.put(KCalendarCofig.newInstance().EndTime, KCalendarCofig.newInstance().choosEndData);
-                        myInterface.chooseDate(mTimeMap);
+                        myInterface.chooseDate(mDateBean);
                     }
                 } else {
                     if (myInterface != null) {
-                        if (TextUtils.isEmpty(KCalendarCofig.newInstance().choosStartData)) {
+                       /* if (TextUtils.isEmpty(mDateBean.choosStartData)) {
                             mTimeMap.put(KCalendarCofig.newInstance().StartTime, mOnlyOneTimeNowDate);
-                        } else {
-
-                            mTimeMap.put(KCalendarCofig.newInstance().StartTime, KCalendarCofig.newInstance().choosStartData);
-                        }
-                        myInterface.chooseDate(mTimeMap);
+                        }*/
+                        myInterface.chooseDate(mDateBean);
                     }
                 }
             }
@@ -312,16 +321,6 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
                 dismiss();
             }
         }
-    }
-
-
-    /**
-     * 更新数据
-     */
-    private void updaterData() {
-        KCalendarCofig.newInstance().choosStartData = "";
-        KCalendarCofig.newInstance().choosEndData = "";
-
     }
 
 
@@ -340,9 +339,9 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
      */
     @Override
     public void onCalendarClick(int row, int col, String dateFormat) {
-        if (!TextUtils.isEmpty(KCalendarCofig.newInstance().TimeSelectType) && "2".equals(KCalendarCofig.newInstance().TimeSelectType)) {
+        if (mDateBean.nowType == KCalendarCofig.newInstance().doubleType) {
             chooseTimeSectionMode(row, col, dateFormat);
-        } else {
+        } else if (mDateBean.nowType == KCalendarCofig.newInstance().singleType) {
             chooseOnlyOneTime(row, col, dateFormat);
         }
     }
@@ -361,8 +360,8 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
 
         if (mCalendar.getCalendarMonth() - month == 1//跨年跳转
                 || mCalendar.getCalendarMonth() - month == -11) {
-            if (KCalendarCofig.newInstance().minTime > 0) {
-                if (CalendarDateUtils.compareMonth(KCalendarCofig.newInstance().minTime, mCalendar.getCalendarMonth(), mCalendar.getCalendarYear())) {
+            if (mDateBean.minTime > 0) {
+                if (CalendarDateUtils.compareMonth(mDateBean.minTime, mCalendar.getCalendarMonth(), mCalendar.getCalendarYear())) {
                     mCalendar.lastMonth();
                 } else {
                     Toast.makeText(context, KCalendarCofig.newInstance().exceedHint, Toast.LENGTH_LONG).show();
@@ -385,18 +384,18 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
         } else {
 
 
-            if (TextUtils.isEmpty(KCalendarCofig.newInstance().nowTimeType) || KCalendarCofig.newInstance().nowTimeTypeEnd.equals(KCalendarCofig.newInstance().nowTimeType)) {
+            if (mDateBean.nowTimeType == -1 || mDateBean.nowTimeType == KCalendarCofig.newInstance().nowTimeTypeEnd) {
                 mCalendar.removeAllBgColor();
                 mCalendar.setCalendarDayBgColor(dateFormat,
                         KCalendarCofig.newInstance().StartSingBg);
-                KCalendarCofig.newInstance().choosStartData = dateFormat;
-                KCalendarCofig.newInstance().choosEndData = "";
-                KCalendarCofig.newInstance().nowTimeType = KCalendarCofig.newInstance().nowTimeTypeStart;
+                mDateBean.choosStartData = dateFormat;
+                mDateBean.choosEndData = "";
+                mDateBean.nowTimeType = KCalendarCofig.newInstance().nowTimeTypeStart;
 
-            } else if (KCalendarCofig.newInstance().nowTimeTypeStart.equals(KCalendarCofig.newInstance().nowTimeType)) {
+            } else if (mDateBean.nowTimeType == KCalendarCofig.newInstance().nowTimeTypeStart) {
 
 
-                int type = compareDate(CalendarDateUtils.str2DateArriveDay(KCalendarCofig.newInstance().choosStartData),
+                int type = compareDate(CalendarDateUtils.str2DateArriveDay(mDateBean.choosStartData),
                         CalendarDateUtils.str2DateArriveDay(dateFormat));
 
                 if (type == 1) {
@@ -404,21 +403,21 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
                     mCalendar.removeAllBgColor();
                     mCalendar.setCalendarDayBgColor(dateFormat,
                             KCalendarCofig.newInstance().StartSingBg);
-                    KCalendarCofig.newInstance().choosStartData = dateFormat;
-                    KCalendarCofig.newInstance().choosEndData = "";
-                    KCalendarCofig.newInstance().nowTimeType = KCalendarCofig.newInstance().nowTimeTypeStart;
+                    mDateBean.choosStartData = dateFormat;
+                    mDateBean.choosEndData = "";
+                    mDateBean.nowTimeType = KCalendarCofig.newInstance().nowTimeTypeStart;
 
 
                 } else if (type == -1) {
                     mCalendar.setCalendarDayBgColor(dateFormat,
                             KCalendarCofig.newInstance().EndSingBg);
-                    KCalendarCofig.newInstance().choosEndData = dateFormat;
-                    KCalendarCofig.newInstance().nowTimeType = KCalendarCofig.newInstance().nowTimeTypeEnd;
+                    mDateBean.choosEndData = dateFormat;
+                    mDateBean.nowTimeType = KCalendarCofig.newInstance().nowTimeTypeEnd;
                 } else if (type == 2) {
                     mCalendar.setCalendarDayBgColor(dateFormat,
                             KCalendarCofig.newInstance().oincideSingBg);
-                    KCalendarCofig.newInstance().choosEndData = dateFormat;
-                    KCalendarCofig.newInstance().nowTimeType = KCalendarCofig.newInstance().nowTimeTypeEnd;
+                    mDateBean.choosEndData = dateFormat;
+                    mDateBean.nowTimeType = KCalendarCofig.newInstance().nowTimeTypeEnd;
                 }
             }
         }
@@ -431,8 +430,8 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
 
         if (mCalendar.getCalendarMonth() - month == 1//跨年跳转
                 || mCalendar.getCalendarMonth() - month == -11) {
-            if (KCalendarCofig.newInstance().minTime > 0) {
-                if (CalendarDateUtils.compareMonth(KCalendarCofig.newInstance().minTime, mCalendar.getCalendarMonth(), mCalendar.getCalendarYear())) {
+            if (mDateBean.minTime > 0) {
+                if (CalendarDateUtils.compareMonth(mDateBean.minTime, mCalendar.getCalendarMonth(), mCalendar.getCalendarYear())) {
                     mCalendar.lastMonth();
                 } else {
                     Toast.makeText(context, KCalendarCofig.newInstance().exceedHint, Toast.LENGTH_LONG).show();
@@ -457,7 +456,7 @@ public class DialogChooseStartAndEndTime extends android.app.Dialog implements V
             mCalendar.removeAllBgColor();
             mCalendar.setCalendarDayBgColor(dateFormat,
                     KCalendarCofig.newInstance().OnceSingBg);
-            KCalendarCofig.newInstance().choosStartData = dateFormat;
+            mDateBean.choosStartData = dateFormat;
 
         }
     }

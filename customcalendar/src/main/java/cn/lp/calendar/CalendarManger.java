@@ -12,8 +12,17 @@ public class CalendarManger {
     private DialogChooseStartAndEndTime mChooseStartAndEndTime;
 
 
-    public CalendarManger() {
-        initData();
+    private static class Holder {
+        private static CalendarManger mAccountData = new CalendarManger();
+    }
+
+
+    private CalendarManger() {
+
+    }
+
+    public static CalendarManger newInstance() {
+        return CalendarManger.Holder.mAccountData;
     }
 
     /**
@@ -101,16 +110,6 @@ public class CalendarManger {
         setStartAndEndIdentical(startAndEndIdenticalDrawableResId);
     }
 
-    /**
-     * 最低时间
-     *
-     * @param minTime
-     */
-    public void setminTime(int minTime) {
-
-        KCalendarCofig.newInstance().minTime = minTime;
-    }
-
 
     /**
      * 区间选择时间端并且没有最小时间
@@ -156,11 +155,6 @@ public class CalendarManger {
             mChooseStartAndEndTime.show();
         }
         mChooseStartAndEndTime.chooseOnlyOneTime(startDate, minTime);
-    }
-
-    public void initData() {
-        setminTime(-1);
-        KCalendarCofig.newInstance().nowTimeType = KCalendarCofig.newInstance().nowTimeTypeStart;
     }
 
 
