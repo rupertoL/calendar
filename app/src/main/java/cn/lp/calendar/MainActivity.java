@@ -6,8 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Map;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, CalendarTimeListenter {
 
     private Button mBtnOne;
@@ -18,9 +16,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mTvTowStartTime;
     private TextView mTvTowEndTime;
     private TextView mTvThreeStartTime;
-    private CalendarManger mCalendarMangerOne;
-    private CalendarManger mCalendarMangerTow;
-    private CalendarManger mCalendarMangerThree;
     int nowType = -1;
     long minTime = 1514736000 * 1000;
 
@@ -63,39 +58,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_one:
-                if (mCalendarMangerOne == null) {
-                    mCalendarMangerOne = new CalendarManger();
-                }
                 nowType = 1;
                 String startTime = mTvOneStartTime.getText().toString();
                 String endTime = mMTvOneEndTime.getText().toString();
-                mCalendarMangerOne.getTimeQuantum(this, minTime, startTime, endTime, this);
+                CalendarManger.newInstance().getTimeQuantum(this, minTime, startTime, endTime, this);
                 break;
             case R.id.btn_tow:
-                if (mCalendarMangerTow == null) {
-                    mCalendarMangerTow = new CalendarManger();
-                }
                 nowType = 2;
                 String startTimeTow = mTvTowStartTime.getText().toString();
                 String endTimeTow = mTvTowEndTime.getText().toString();
-                mCalendarMangerTow.getTimeQuantum(this, startTimeTow, endTimeTow, this);
+                CalendarManger.newInstance().getTimeQuantum(this, startTimeTow, endTimeTow, this);
                 break;
             case R.id.btn_three:
                 nowType = 3;
-                if (mCalendarMangerThree == null) {
-                    mCalendarMangerThree = new CalendarManger();
-                }
                 String startTimeThree = mTvThreeStartTime.getText().toString();
-                mCalendarMangerThree.getTimePoint(this, minTime, startTimeThree, this);
-
+                CalendarManger.newInstance().getTimePoint(this, minTime, startTimeThree, this);
                 break;
         }
     }
 
     @Override
-    public void chooseDate(Map<String, String> data) {
-        String startData = data.get(KCalendarCofig.newInstance().StartTime);
-        String endDate = data.get(KCalendarCofig.newInstance().EndTime);
+    public void chooseDate(DateBean dateBean) {
+        String startData = dateBean.choosStartData;
+        String endDate = dateBean.choosEndData;
         switch (nowType) {
             case 1:
                 mTvOneStartTime.setText(startData);

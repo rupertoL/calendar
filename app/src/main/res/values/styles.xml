@@ -8,4 +8,22 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <style name="MyAppCompatTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@null</item>
+        <!--<item name="colorPrimary">@color/unsigned_color_black</item>-->
+        <item name="colorPrimaryDark">#999999</item>
+        <item name="colorAccent">#aaaaaa</item>
+    </style>
+
+    <style name="MyAppCompatTheme.NoActionBar.FullScreen" parent="MyAppCompatTheme.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@color/with</item>
+    </style>
+
+
+    <style name="MyAppCompatTheme.NoActionBar.FullScreen_Splash" parent="MyAppCompatTheme.NoActionBar.FullScreen">
+        <item name="android:windowBackground">@color/colorPrimaryDark</item>
+    </style>
+
 </resources>
